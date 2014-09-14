@@ -1,0 +1,32 @@
+/**
+ * 
+ */
+package textbuddy.main;
+
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * @author Kiwi
+ *
+ */
+public class SortTest {
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Before
+    public void setUp() throws Exception {
+    }
+
+    /**
+     * Test method for {@link TextBuddy#executeTestCommand(java.util.ArrayList, TextBuddy.COMMAND_TYPE, java.lang.String)}.
+     */
+    @Test
+    public void testExecuteTestCommand() {
+        fail("Not yet implemented");
+    }
+
+}
