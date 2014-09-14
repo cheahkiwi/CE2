@@ -457,42 +457,11 @@ class ContentLine{
     private String content = "";
     private ArrayList<String> keywords = new ArrayList<String>();
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
-    public String toString() {
+    public String toString(){
         return this.content;
     }
     
-    /**
-     * Method to implement the String.compareTo method on this class
-     * @see java.lang.String#compareTo()
-     * 
-     * @param value
-     *            ContentLine value to be compared with
-     */
-    public int compareTo(ContentLine value){
-        return this.content.compareTo(value.toString());
-    }
-    
-    /**
-     * Method to implement the String.compareToIgnoreCase method on this class
-     * @see java.lang.String#compareToIgnoreCase()
-     * 
-     * @param value
-     *            ContentLine value to be compared with
-     */
-    public int compareToIgnoreCase(ContentLine value){
-        return this.content.compareToIgnoreCase(value.toString());
-    }
-    
-    /**
-     * Method to initialize the keywords of a ContentLine object
-     * 
-     * @param content
-     *            String to be stored as keywords
-     */
     private void initializeKeywords(String content){
         String[] pieces = content.split(REG_TO_SPLIT_CONTENT);
         for(String i : pieces){
@@ -500,24 +469,11 @@ class ContentLine{
         }
     }
     
-    /**
-     * ContentLine Default Constructor
-     * 
-     * @param content
-     *            Content to be associated with a ContentLine Object
-     */
     public ContentLine(String content){
         this.content = content;
         initializeKeywords(content);
     }
     
-    /**
-     * Method to check if a ContentLine object contains a specific word. 
-     * 
-     * @param word
-     *            Word to check in the ContentLine object
-     * @return True if the ContentLine object contains the word; False otherwise
-     */
     public boolean hasKeyword(String word){
         if(keywords.contains(word)){
             return true;
@@ -525,5 +481,4 @@ class ContentLine{
             return false;
         }
     }
-    
 }

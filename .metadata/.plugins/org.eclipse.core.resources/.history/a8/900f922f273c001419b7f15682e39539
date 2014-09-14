@@ -50,7 +50,7 @@ public class TextBuddy {
 
     // Current file that is being accessed
     public static String currentFilename = EMPTY_STRING;
-    public static ArrayList<ContentLine> fileContent = null;
+    public static ArrayList<String> fileContent = null;
 
     // These are the possible command types
     enum COMMAND_TYPE {
@@ -156,7 +156,7 @@ public class TextBuddy {
      */
     private static void readFile(String filename) {
         File file = new File(filename);
-        fileContent = new ArrayList<ContentLine>();
+        fileContent = new ArrayList<String>();
 
         // Checks if file exist, load content into application
         if (file.isFile()) {
@@ -165,8 +165,7 @@ public class TextBuddy {
                 br = new BufferedReader(new FileReader(filename));
                 String line = br.readLine();
                 while (line != null) {
-                    ContentLine newLine = new ContentLine(line);
-                    fileContent.add(newLine);
+                    fileContent.add(line);
                     line = br.readLine();
                 }
             } catch (Exception err) {
@@ -245,7 +244,7 @@ public class TextBuddy {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(currentFilename);
-            for (ContentLine line : fileContent) {
+            for (String line : fileContent) {
                 writer.println(line);
             }
         } catch (Exception err) {
@@ -290,7 +289,7 @@ public class TextBuddy {
     }
 
     private static void displayDeletedMessage(int i) {
-        showMessage(MESSAGE_DELETED_LINE, toArray(currentFilename,fileContent.get(i).toString()));
+        showMessage(MESSAGE_DELETED_LINE, toArray(currentFilename,fileContent.get(i)));
     }
 
     private static void addLine(String parameter) {
@@ -298,9 +297,8 @@ public class TextBuddy {
             showMessage(MESSAGE_NOTHING_TO_ADD, EMPTY_STRING);
             return;
         }
-        ContentLine newContent = new ContentLine(parameter);
-        fileContent.add(newContent);
-        showMessage(MESSAGE_ADDED_LINE, toArray(currentFilename, newContent.toString()));
+        fileContent.add(parameter);
+        showMessage(MESSAGE_ADDED_LINE, toArray(currentFilename, parameter));
     }
 
     private static void displayAllLines() {
@@ -309,8 +307,8 @@ public class TextBuddy {
             displayEmptyFileMessage();
             return;
         }
-        for (ContentLine line : fileContent) {
-            showMessage(MESSAGE_DISPLAY_LINE_WITH_NUMBER, toArray(i + EMPTY_STRING, line.toString()));
+        for (String line : fileContent) {
+            showMessage(MESSAGE_DISPLAY_LINE_WITH_NUMBER, toArray(i + EMPTY_STRING, line));
             i++;
         }
     }
@@ -443,87 +441,4 @@ public class TextBuddy {
     private static void showMessage(String message, String args) {
         System.out.printf(message, args);
     }
-}
-
-/**
- * <h1>ContentLine</h1> Object to hold contents of a file
- * <p>
- */
-class ContentLine{
-    // Private Constants
-    private final String REG_TO_SPLIT_CONTENT = " ";
-    
-    // Class Variables
-    private String content = "";
-    private ArrayList<String> keywords = new ArrayList<String>();
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return this.content;
-    }
-    
-    /**
-     * Method to implement the String.compareTo method on this class
-     * @see java.lang.String#compareTo()
-     * 
-     * @param value
-     *            ContentLine value to be compared with
-     */
-    public int compareTo(ContentLine value){
-        return this.content.compareTo(value.toString());
-    }
-    
-    /**
-     * Method to implement the String.compareToIgnoreCase method on this class
-     * @see java.lang.String#compareToIgnoreCase()
-     * 
-     * @param value
-     *            ContentLine value to be compared with
-     */
-    public int compareToIgnoreCase(ContentLine value){
-        return this.content.compareToIgnoreCase(value.toString());
-    }
-    
-    /**
-     * Method to initialize the keywords of a ContentLine object
-     * 
-     * @param content
-     *            String to be stored as keywords
-     */
-    private void initializeKeywords(String content){
-        String[] pieces = content.split(REG_TO_SPLIT_CONTENT);
-        for(String i : pieces){
-            this.keywords.add(i);
-        }
-    }
-    
-    /**
-     * ContentLine Default Constructor
-     * 
-     * @param content
-     *            Content to be associated with a ContentLine Object
-     */
-    public ContentLine(String content){
-        this.content = content;
-        initializeKeywords(content);
-    }
-    
-    /**
-     * Method to check if a ContentLine object contains a specific word. 
-     * 
-     * @param word
-     *            Word to check in the ContentLine object
-     * @return True if the ContentLine object contains the word; False otherwise
-     */
-    public boolean hasKeyword(String word){
-        if(keywords.contains(word)){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    
 }
