@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -15,25 +16,40 @@ import java.util.ArrayList;
  * Note: -> For regression testing, use TestInput.txt order for the expected
  * output to reflect the proper strings. Regression testing commands used:
  * 
- * java TextBuddy TestFile.txt < testinput.txt > output.txt
- * fc output.txt expected.txt
+ * java TextBuddy TestFile.txt < testinput.txt > output.txt fc output.txt
+ * expected.txt
  *
  * 
  * @author Cheah Kit Weng, A0059806W
  *
  */
 public class TextBuddy {
-    // Messsages required by TextBuddy
-    public static final String ERROR_INVALID_ARGUMENTS = "Incorrect number of arugments found!";
-    public static final String ERROR_FILENAME_INCORRECT = "File is invalid!";
-    public static final String ERROR_WHILE_SAVING = "Error encountered while saving content to file!";
-    public static final String ERROR_ILLEGAL_COMMAND = "Invalid command detected! Acceptable commands are:";
-    public static final String ERROR_UNKNOWN = "Unknown error encountered! TextBuddy is exiting...";
+    public static final String EMPTY_STRING = "";
+    
+    // Messages required by TextBuddy
+    public static final String MESSAGE_GREETING = "Welcome to TextBuddy. %s is ready for use%n";
+    public static final String MESSAGE_IS_EMPTY = "%s is empty%n";
+    public static final String MESSAGE_ADDED_LINE = "added to %s: \"%s\"%n";
+    public static final String MESSAGE_NOTHING_TO_ADD = "Nothing to add%n";
+    public static final String MESSAGE_ALL_CONTENT_DELETED = "all content deleted from %s%n";
+    public static final String MESSAGE_NOTHING_TO_DELETE = "Nothing to delete%n";
+    public static final String MESSAGE_DELETED_LINE = "deleted from %s: \"%s\"%n";
+    public static final String MESSAGE_DISPLAY_LINE_WITH_NUMBER = "%s. %s%n";
 
+    // Error messages required by TextBuddy
+    public static final String ERROR_INVALID_ARGUMENTS = "Incorrect number of arugments found!%n";
+    public static final String ERROR_FILENAME_INCORRECT = "File is invalid!%n";
+    public static final String ERROR_WHILE_SAVING = "Error encountered while saving content to file!%n";
+    public static final String ERROR_ILLEGAL_COMMAND = "Invalid command detected! Acceptable commands are:";
+    public static final String ERROR_UNKNOWN = "Unknown error encountered! TextBuddy is exiting...%n";
+
+    // User-input related constants
     public static final String PROMPT_COMMAND = "command: ";
+    public static final String REG_TO_SPLIT_USER_INPUT = " ";
+    public static final int SPLIT_LIMIT = 2;
 
     // Current file that is being accessed
-    public static String currentFilename = "";
+    public static String currentFilename = EMPTY_STRING;
     public static ArrayList<String> fileContent = null;
 
     // These are the possible command types
@@ -45,10 +61,8 @@ public class TextBuddy {
      * These are the possible command inputs from console
      * 
      * These are mapped to the COMMAND_TYPES in the following:
-     * COMMAND_FROM_CONSOLE[0] -> ADD_LINE 
-     * COMMAND_FROM_CONSOLE[1] -> DISPLAY
-     * COMMAND_FROM_CONSOLE[2] -> DELETE 
-     * COMMAND_FROM_CONSOLE[3] -> CLEAR
+     * COMMAND_FROM_CONSOLE[0] -> ADD_LINE COMMAND_FROM_CONSOLE[1] -> DISPLAY
+     * COMMAND_FROM_CONSOLE[2] -> DELETE COMMAND_FROM_CONSOLE[3] -> CLEAR
      * COMMAND_FROM_CONSOLE[4] -> EXIT
      */
     private static String[] COMMAND_FROM_CONSOLE = { "add", "display",
@@ -67,7 +81,6 @@ public class TextBuddy {
     public static void main(String[] args) {
         checkArguments(args);
         currentFilename = args[0];
-        readFile(currentFilename);
         displayGreeting();
         processUserInput();
 
@@ -115,13 +128,24 @@ public class TextBuddy {
      */
     private static boolean isValidDirectory(String filename) {
         File file = new File(filename);
-        File parentDirectory = file.getParentFile();
 
-        if (parentDirectory != null && !parentDirectory.isDirectory()) {
+        if (isValidParentDirectory(file)) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Method to check if the parent directory of file is valid
+     * 
+     * @param file
+     *            File whose parent directory is to be checked
+     * @return True if parent directory is valid
+     */
+    private static boolean isValidParentDirectory(File file) {
+        File parentDirectory = file.getParentFile();
+        return parentDirectory != null && !parentDirectory.isDirectory();
     }
 
     /**
@@ -136,16 +160,22 @@ public class TextBuddy {
 
         // Checks if file exist, load content into application
         if (file.isFile()) {
+            BufferedReader br = null;
             try {
-                BufferedReader br = new BufferedReader(new FileReader(filename));
+                br = new BufferedReader(new FileReader(filename));
                 String line = br.readLine();
                 while (line != null) {
                     fileContent.add(line);
                     line = br.readLine();
                 }
-                br.close();
             } catch (Exception err) {
                 printAndExitApplication(ERROR_UNKNOWN);
+            }finally{
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    printAndExitApplication(ERROR_UNKNOWN);
+                }
             }
         }
     }
@@ -155,8 +185,7 @@ public class TextBuddy {
      * 
      */
     private static void displayGreeting() {
-        showMessage("Welcome to TextBuddy. " + currentFilename
-                + " is ready for use");
+        showMessage(MESSAGE_GREETING, currentFilename);
     }
 
     /**
@@ -168,26 +197,28 @@ public class TextBuddy {
         boolean isExit = false;
 
         do {
-            System.out.print(PROMPT_COMMAND);
+            showMessage(PROMPT_COMMAND, "");
             try {
                 String userInput = reader.readLine().trim();
                 COMMAND_TYPE command = findCommand(userInput);
-
+                readFile(currentFilename);
                 switch (command) {
                 case ADD_LINE:
                     addLine(getParameter(userInput));
+                    saveContents();
                     break;
                 case DISPLAY:
                     displayAllLines();
                     break;
                 case DELETE:
                     deleteLine(getParameter(userInput));
+                    saveContents();
                     break;
                 case CLEAR:
                     clearLines();
+                    saveContents();
                     break;
                 case EXIT:
-                    saveContents();
                     isExit = true;
                     break;
                 case INVALID:
@@ -205,15 +236,21 @@ public class TextBuddy {
 
     }
 
+    /**
+     * Method to save contents to file
+     * 
+     */
     private static void saveContents() {
+        PrintWriter writer = null;
         try {
-            PrintWriter writer = new PrintWriter(currentFilename);
+            writer = new PrintWriter(currentFilename);
             for (String line : fileContent) {
                 writer.println(line);
             }
-            writer.close();
         } catch (Exception err) {
             printAndExitApplication(ERROR_WHILE_SAVING);
+        } finally{
+            writer.close();
         }
 
     }
@@ -224,20 +261,20 @@ public class TextBuddy {
     }
 
     private static void displayClearAllMessage() {
-        showMessage("all content deleted from " + currentFilename);
+        showMessage(MESSAGE_ALL_CONTENT_DELETED, currentFilename);
     }
 
     private static void deleteLine(String parameter) {
         if (fileContent.size() < 1 || parameter.isEmpty()) {
-            showMessage("Nothing to delete");
+            showMessage(MESSAGE_NOTHING_TO_DELETE, EMPTY_STRING);
             return;
         }
-        
+
         int lineToBeDeleted = 0;
-        
-        try{
+
+        try {
             lineToBeDeleted = Integer.parseInt(parameter);
-        }catch(Exception err){
+        } catch (Exception err) {
             return;
         }
 
@@ -252,18 +289,16 @@ public class TextBuddy {
     }
 
     private static void displayDeletedMessage(int i) {
-        showMessage("deleted from " + currentFilename + ": \""
-                + fileContent.get(i) + "\"");
+        showMessage(MESSAGE_DELETED_LINE, toArray(currentFilename,fileContent.get(i)));
     }
 
     private static void addLine(String parameter) {
         if (parameter.isEmpty()) {
-            showMessage("Nothing to add");
+            showMessage(MESSAGE_NOTHING_TO_ADD, EMPTY_STRING);
             return;
         }
         fileContent.add(parameter);
-        showMessage("added to " + currentFilename + ": \"" + parameter
-                + "\"");
+        showMessage(MESSAGE_ADDED_LINE, toArray(currentFilename, parameter));
     }
 
     private static void displayAllLines() {
@@ -273,13 +308,13 @@ public class TextBuddy {
             return;
         }
         for (String line : fileContent) {
-            showMessage(i + ". " + line);
+            showMessage(MESSAGE_DISPLAY_LINE_WITH_NUMBER, toArray(i + EMPTY_STRING, line));
             i++;
         }
     }
 
     private static void displayEmptyFileMessage() {
-        showMessage(currentFilename + " is empty");
+        showMessage(MESSAGE_IS_EMPTY, currentFilename);
     }
 
     /**
@@ -291,15 +326,30 @@ public class TextBuddy {
      * @return String value
      */
     private static String getParameter(String userInput) {
-        String[] pieces = userInput.split(" ", 2);
+        if (userInput.isEmpty()) {
+            return EMPTY_STRING;
+        }
 
-        if (userInput.isEmpty() || pieces.length < 2) {
-            return "";
+        String[] pieces = userInput.split(REG_TO_SPLIT_USER_INPUT, SPLIT_LIMIT);
+
+        if (isInvalidNumberOfArguments(pieces)) {
+            return EMPTY_STRING;
         }
 
         String value = pieces[1];
 
         return value.trim();
+    }
+
+    /**
+     * Method to cursorily check if user did not give a value.
+     * 
+     * @param pieces
+     *            Input to be checked
+     * @return True if there is no value; False otherwise
+     */
+    private static boolean isInvalidNumberOfArguments(String[] pieces) {
+        return pieces.length < SPLIT_LIMIT;
     }
 
     /**
@@ -313,7 +363,7 @@ public class TextBuddy {
         if (input.isEmpty()) {
             return COMMAND_TYPE.INVALID;
         }
-        String[] pieces = input.split(" ");
+        String[] pieces = input.split(REG_TO_SPLIT_USER_INPUT);
         String command = pieces[0];
 
         if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[0])) {
@@ -351,11 +401,44 @@ public class TextBuddy {
      *            Message to be printed before quitting
      */
     private static void printAndExitApplication(String msg) {
-        showMessage(msg);
+        showMessage(msg, EMPTY_STRING);
         System.exit(0);
     }
-    
-    private static void showMessage(String message){
-        System.out.println(message);
+
+    /**
+     * Method to convert 2 separate strings into an array
+     * 
+     * @param x
+     *            First string
+     * @param y
+     *            Second string
+     * @return String array with the 2 strings
+     */
+    private static String[] toArray(String x, String y) {
+        return new String[] { x, y };
+    }
+
+    /**
+     * Method to print a message with an array of values
+     * 
+     * @param message
+     *            Message to be printed
+     * @param args
+     *            Array of values to be printed
+     */
+    private static void showMessage(String message, Object[] args) {
+        System.out.printf(message, args);
+    }
+
+    /**
+     * Method to print a message with a single value
+     * 
+     * @param message
+     *            Message to be printed
+     * @param args
+     *            A single value to be printed
+     */
+    private static void showMessage(String message, String args) {
+        System.out.printf(message, args);
     }
 }
