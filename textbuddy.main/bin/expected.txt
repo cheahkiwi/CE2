@@ -1,0 +1,31 @@
+Welcome to TextBuddy. TestFile.txt is ready for use
+command: Invalid command detected! Acceptable commands are:
+add display delete clear exit 
+command: Invalid command detected! Acceptable commands are:
+add display delete clear exit 
+command: all content deleted from TestFile.txt
+command: Nothing to delete
+command: TestFile.txt is empty
+command: added to TestFile.txt: "A line"
+command: added to TestFile.txt: "Another line"
+command: 1. A line
+2. Another line
+command: deleted from TestFile.txt: "A line"
+command: 1. Another line
+command: command: deleted from TestFile.txt: "Another line"
+command: Nothing to delete
+command: Nothing to delete
+command: TestFile.txt is empty
+command: all content deleted from TestFile.txt
+command: added to TestFile.txt: "A third line"
+command: 1. A third line
+command: all content deleted from TestFile.txt
+command: TestFile.txt is empty
+command: Invalid command detected! Acceptable commands are:
+add display delete clear exit 
+command: Invalid command detected! Acceptable commands are:
+add display delete clear exit 
+command: Nothing to add
+command: Nothing to delete
+command: all content deleted from TestFile.txt
+command: 

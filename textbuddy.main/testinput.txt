@@ -1,0 +1,26 @@
+
+
+clear
+delete 1
+display
+add A line
+add Another line
+display
+delete 1
+display
+delete 2
+delete 1
+delete 3
+delete -1
+display
+clear
+add A third line
+display
+clear
+display
+
+invalidCommand
+add
+delete
+clear
+exit
