@@ -247,11 +247,10 @@ public class TextBuddy {
 
     }
 
-    public static String executeTestCommand(ArrayList<ContentLine> content,
-            COMMAND_TYPE cmd, String parameter) {
+    public static String executeTestCommand(ArrayList<ContentLine> content, COMMAND_TYPE cmd, String parameter){
         fileContent = content;
         String result = EMPTY_STRING;
-        switch (cmd) {
+        switch(cmd){
         case SORT:
             sortLines();
             result = printFileContentToString();
@@ -262,23 +261,23 @@ public class TextBuddy {
         default:
             break;
         }
-
+        
         return result;
     }
-
+    
     /**
      * Method to print all file content to a string
      * 
      * @return String representation of file content
      */
-    public static String printFileContentToString() {
+    public static String printFileContentToString(){
         String allContent = "";
-        for (ContentLine line : fileContent) {
+        for(ContentLine line:fileContent){
             allContent = allContent + line + "/n";
         }
         return allContent.trim();
     }
-
+    
     /**
      * Method to save contents to file
      * 
@@ -309,55 +308,33 @@ public class TextBuddy {
         ContentLine[] sortedArray = sort(contentArray);
         fileContent = new ArrayList<ContentLine>(Arrays.asList(sortedArray));
     }
-
-    /**
-     * Method to sort the array in alphabetical order. This sort uses the concept
-     * of merge sort
-     * 
-     * @param content
-     *            Array to be sorted
-     * @return Sorted array
-     */
-    private static ContentLine[] sort(ContentLine[] content) {
-        if (content.length == 1) {
+    
+    private static ContentLine[] sort(ContentLine[] content){
+        if(content.length == 1){
             return content;
         }
-        int mid = content.length / 2;
+        int mid = content.length/2;
         ContentLine[] leftPartition = sort(Arrays.copyOfRange(content, 0, mid));
-        ContentLine[] rightPartition = sort(Arrays.copyOfRange(content, mid,
-                content.length));
+        ContentLine[] rightPartition = sort(Arrays.copyOfRange(content, mid, content.length));
         return merge(leftPartition, rightPartition, content.length);
     }
-
-    /**
-     * Method to merge 2 arrays together in alphabetical order
-     * 
-     * @param leftPartition
-     *            First array for merge
-     * @param rightPartition
-     *            Second array for merge
-     * @param sizeOfArray
-     *            The size of the merged array
-     * @return Merged and sorted array
-     */
-    private static ContentLine[] merge(ContentLine[] leftPartition,
-            ContentLine[] rightPartition, int sizeOfArray) {
+    
+    private static ContentLine[] merge(ContentLine[] leftPartition, ContentLine[] rightPartition, int sizeOfArray) {
         ContentLine[] result = new ContentLine[sizeOfArray];
         int leftIterator = 0;
         int rightIterator = 0;
-        for (int i = 0; i < result.length; i++) {
-            if (leftIterator == leftPartition.length) {
+        for(int i = 0; i < result.length; i++){
+            if(leftIterator == leftPartition.length){
                 result[i] = rightPartition[rightIterator];
                 rightIterator++;
-            } else if (rightIterator == rightPartition.length) {
+            }else if(rightIterator == rightPartition.length){
                 result[i] = leftPartition[leftIterator];
                 leftIterator++;
-            } else {
-                if (rightPartition[rightIterator]
-                        .compareToIgnoreCase(leftPartition[leftIterator]) < 0) {
+            }else{
+                if(rightPartition[rightIterator].compareToIgnoreCase(leftPartition[leftIterator]) < 0){
                     result[i] = rightPartition[rightIterator];
                     rightIterator++;
-                } else {
+                }else{
                     result[i] = leftPartition[leftIterator];
                     leftIterator++;
                 }

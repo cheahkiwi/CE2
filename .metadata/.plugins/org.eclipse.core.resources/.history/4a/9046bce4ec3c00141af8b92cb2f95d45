@@ -41,7 +41,7 @@ public class SortAndSearchTest {
     private final String TEST_CASE_4_LINE_2 = "Bye Bye World";
     private final String TEST_CASE_4_LINE_3 = "An Apple a day keeps the Doctor away";
     private final String TEST_CASE_4_LINE_4 = "";
-    private final String TEST_CASE_4_SORT_EXPECTED = "/nAn Apple a day keeps the Doctor away/nBye Bye World/nHello World/n";
+    private final String TEST_CASE_4_SORT_EXPECTED = "/nAn Apple a day keeps the Doctor away/nBye Bye World/nHello World";
     
     /**
      * @throws java.lang.Exception
