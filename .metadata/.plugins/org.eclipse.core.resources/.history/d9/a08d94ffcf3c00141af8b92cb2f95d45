@@ -295,8 +295,8 @@ public class TextBuddy {
 
     }
 
-    private static ArrayList<ContentLine> searchForLines(String parameter) {
-        return null;
+    private static void searchForLines(String parameter) {
+        // TODO Auto-generated method stub
 
     }
 
