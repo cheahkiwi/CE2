@@ -299,9 +299,6 @@ public class TextBuddy {
     }
 
     private static ArrayList<ContentLine> searchForLines(String parameter) {
-        if(parameter.isEmpty()){
-            return fileContent;
-        }
         ArrayList<ContentLine> result = new ArrayList<ContentLine>();
         
         for(ContentLine line : fileContent){

@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <h1>TextBuddy</h1> TextBuddy application that performs functions as described
@@ -299,9 +300,6 @@ public class TextBuddy {
     }
 
     private static ArrayList<ContentLine> searchForLines(String parameter) {
-        if(parameter.isEmpty()){
-            return fileContent;
-        }
         ArrayList<ContentLine> result = new ArrayList<ContentLine>();
         
         for(ContentLine line : fileContent){
