@@ -76,10 +76,5 @@ public class SortAndSearchTest {
         
         assertEquals(TEST_CASE_4_SORT_EXPECTED,TextBuddy.executeTestCommand(testCase4, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
     }
-    
-    @Test
-    public void testSearchCommand(){
-        
-    }
 
 }
