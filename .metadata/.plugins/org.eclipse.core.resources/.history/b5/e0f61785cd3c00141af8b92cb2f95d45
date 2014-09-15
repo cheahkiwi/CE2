@@ -48,7 +48,6 @@ public class SortAndSearchTest {
     @Test
     public void testExecuteTestCommand() {
         assertEquals(TEST_CASE_1_SORT_EXPECTED,TextBuddy.executeTestCommand(testCase1, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
-        assertEquals(TEST_CASE_1_SEARCH_EXPECTED,TextBuddy.executeTestCommand(testCase1, TextBuddy.COMMAND_TYPE.SEARCH, EMPTY_STRING));
     }
 
 }

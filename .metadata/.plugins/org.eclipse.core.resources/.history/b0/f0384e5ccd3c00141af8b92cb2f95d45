@@ -271,9 +271,7 @@ public class TextBuddy {
     public static String printFileContent(){
         String allContent = "";
         for(ContentLine line:fileContent){
-            if(!line.toString().isEmpty()){
-                allContent = allContent + line + "/n";
-            }
+            allContent = allContent + line + "/n";
         }
         return allContent.trim();
     }
