@@ -623,7 +623,7 @@ class ContentLine {
     private void initializeKeywords(String content) {
         String[] pieces = content.split(REG_TO_SPLIT_CONTENT);
         for (String i : pieces) {
-            this.keywords.add(i.toLowerCase());
+            this.keywords.add(i);
         }
     }
 
@@ -646,7 +646,7 @@ class ContentLine {
      * @return True if the ContentLine object contains the word; False otherwise
      */
     public boolean hasKeyword(String word) {
-        if (keywords.contains(word.toLowerCase())) {
+        if (keywords.contains(word)) {
             return true;
         } else {
             return false;
