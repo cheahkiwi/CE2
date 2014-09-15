@@ -303,8 +303,7 @@ public class TextBuddy {
     }
 
     private static void sortLines() {
-        ContentLine[] contentArray = new ContentLine[fileContent.size()];
-        contentArray = fileContent.toArray(contentArray);
+        ContentLine[] contentArray = (ContentLine[]) fileContent.toArray();
         ContentLine[] sortedArray = sort(contentArray);
         fileContent = new ArrayList<ContentLine>(Arrays.asList(sortedArray));
     }
@@ -315,7 +314,7 @@ public class TextBuddy {
         }
         int mid = content.length/2;
         ContentLine[] leftPartition = sort(Arrays.copyOfRange(content, 0, mid));
-        ContentLine[] rightPartition = sort(Arrays.copyOfRange(content, mid, content.length));
+        ContentLine[] rightPartition = sort(Arrays.copyOfRange(content, mid+1, content.length));
         return merge(leftPartition, rightPartition, content.length);
     }
     
