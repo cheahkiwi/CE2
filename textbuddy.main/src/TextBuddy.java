@@ -244,12 +244,14 @@ public class TextBuddy {
         } while (!isExit);
 
     }
-    
+
     public static String executeTestCommand(ArrayList<ContentLine> content, COMMAND_TYPE cmd, String parameter){
         fileContent = content;
+        String result = EMPTY_STRING;
         switch(cmd){
         case SORT:
             sortLines();
+            result = printFileContent();
             break;
         case SEARCH:
             searchForLines(parameter);
@@ -258,7 +260,20 @@ public class TextBuddy {
             break;
         }
         
-        return "";
+        return result;
+    }
+    
+    /**
+     * Method to print all file content to a string
+     * 
+     * @return String representation of file content
+     */
+    public static String printFileContent(){
+        String allContent = "";
+        for(ContentLine line:fileContent){
+            allContent = allContent + line + "/n";
+        }
+        return allContent.trim();
     }
     
     /**

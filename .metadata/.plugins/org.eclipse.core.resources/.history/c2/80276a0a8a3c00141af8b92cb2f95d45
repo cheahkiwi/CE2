@@ -1,0 +1,581 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
+/**
+ * <h1>TextBuddy</h1> TextBuddy application that performs functions as described
+ * in CE1.
+ * <p>
+ * Assupmtions: -> If any exceptions/errors are encountered, default action is
+ * to quit program -> If file already exist, file content must only contain text
+ * 
+ * Note: -> For regression testing, use TestInput.txt order for the expected
+ * output to reflect the proper strings. Regression testing commands used:
+ * 
+ * java TextBuddy TestFile.txt < testinput.txt > output.txt fc output.txt
+ * expected.txt
+ *
+ * 
+ * @author Cheah Kit Weng, A0059806W
+ *
+ */
+public class TextBuddy {
+    public static final String EMPTY_STRING = "";
+
+    // Messages required by TextBuddy
+    public static final String MESSAGE_GREETING = "Welcome to TextBuddy. %s is ready for use%n";
+    public static final String MESSAGE_IS_EMPTY = "%s is empty%n";
+    public static final String MESSAGE_ADDED_LINE = "added to %s: \"%s\"%n";
+    public static final String MESSAGE_NOTHING_TO_ADD = "Nothing to add%n";
+    public static final String MESSAGE_ALL_CONTENT_DELETED = "all content deleted from %s%n";
+    public static final String MESSAGE_NOTHING_TO_DELETE = "Nothing to delete%n";
+    public static final String MESSAGE_DELETED_LINE = "deleted from %s: \"%s\"%n";
+    public static final String MESSAGE_DISPLAY_LINE_WITH_NUMBER = "%s. %s%n";
+
+    // Error messages required by TextBuddy
+    public static final String ERROR_INVALID_ARGUMENTS = "Incorrect number of arugments found!%n";
+    public static final String ERROR_FILENAME_INCORRECT = "File is invalid!%n";
+    public static final String ERROR_WHILE_SAVING = "Error encountered while saving content to file!%n";
+    public static final String ERROR_ILLEGAL_COMMAND = "Invalid command detected! Acceptable commands are:";
+    public static final String ERROR_UNKNOWN = "Unknown error encountered! TextBuddy is exiting...%n";
+
+    // User-input related constants
+    public static final String PROMPT_COMMAND = "command: ";
+    public static final String REG_TO_SPLIT_USER_INPUT = " ";
+    public static final int SPLIT_LIMIT = 2;
+
+    // Current file that is being accessed
+    public static String currentFilename = EMPTY_STRING;
+    public static ArrayList<ContentLine> fileContent = null;
+
+    // These are the possible command types
+    enum COMMAND_TYPE {
+        ADD_LINE, DISPLAY, DELETE, CLEAR, SORT, SEARCH, EXIT, INVALID
+    };
+
+    /**
+     * These are the possible command inputs from console
+     * 
+     * These are mapped to the COMMAND_TYPES in the following:
+     * COMMAND_FROM_CONSOLE[0] -> ADD_LINE COMMAND_FROM_CONSOLE[1] -> DISPLAY
+     * COMMAND_FROM_CONSOLE[2] -> DELETE COMMAND_FROM_CONSOLE[3] -> CLEAR
+     * COMMAND_FROM_CONSOLE[4] -> SORT COMMAND_FROM_CONSOLE[5] -> SEARCH
+     * COMMAND_FROM_CONSOLE[6] -> EXIT
+     */
+    private static String[] COMMAND_FROM_CONSOLE = { "add", "display",
+            "delete", "clear", "sort", "search", "exit" };
+
+    // Variable to hold keyboard input reader
+    private static BufferedReader reader = new BufferedReader(
+            new InputStreamReader(System.in));
+
+    /**
+     * Main Method
+     * 
+     * @param args
+     *            Command-line arguments
+     */
+    public static void main(String[] args) {
+        checkArguments(args);
+        currentFilename = args[0];
+        displayGreeting();
+        processUserInput();
+
+    }
+
+    /**
+     * Method to check if arguments are valid
+     * 
+     * @param args
+     *            Array to be checked
+     */
+    private static void checkArguments(String[] args) {
+        if (args.length < 1) {
+            printAndExitApplication(ERROR_INVALID_ARGUMENTS);
+        }
+
+        if (!isValidFile(args[0])) {
+            printAndExitApplication(ERROR_FILENAME_INCORRECT);
+        }
+
+    }
+
+    /**
+     * Method to check that the filename is valid. Currently, a valid file is
+     * just the file path is valid. Expandable to include file extension checks
+     * 
+     * @param filename
+     *            Filename to be checked
+     * @return True if filename is valid; False otherwise
+     */
+    private static boolean isValidFile(String filename) {
+        if (isValidDirectory(filename)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Method to check if directory is valid (if any). This method is here in
+     * case the declared file path is invalid.
+     * 
+     * @param filename
+     *            File to be checked
+     * @return True if directory is valid; False otherwise
+     */
+    private static boolean isValidDirectory(String filename) {
+        File file = new File(filename);
+
+        if (isValidParentDirectory(file)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Method to check if the parent directory of file is valid
+     * 
+     * @param file
+     *            File whose parent directory is to be checked
+     * @return True if parent directory is valid
+     */
+    private static boolean isValidParentDirectory(File file) {
+        File parentDirectory = file.getParentFile();
+        return parentDirectory != null && !parentDirectory.isDirectory();
+    }
+
+    /**
+     * Method to read file content(if any) and initalize file content variable
+     * 
+     * @param filename
+     *            File to be accessed
+     */
+    private static void readFile(String filename) {
+        File file = new File(filename);
+        fileContent = new ArrayList<ContentLine>();
+
+        // Checks if file exist, load content into application
+        if (file.isFile()) {
+            BufferedReader br = null;
+            try {
+                br = new BufferedReader(new FileReader(filename));
+                String line = br.readLine();
+                while (line != null) {
+                    ContentLine newLine = new ContentLine(line);
+                    fileContent.add(newLine);
+                    line = br.readLine();
+                }
+            } catch (Exception err) {
+                printAndExitApplication(ERROR_UNKNOWN);
+            } finally {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    printAndExitApplication(ERROR_UNKNOWN);
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to display Greeting to the user
+     * 
+     */
+    private static void displayGreeting() {
+        showMessage(MESSAGE_GREETING, currentFilename);
+    }
+
+    /**
+     * Method to process commands entered by the user
+     * 
+     */
+    private static void processUserInput() {
+
+        boolean isExit = false;
+
+        do {
+            showMessage(PROMPT_COMMAND, "");
+            try {
+                String userInput = reader.readLine().trim();
+                COMMAND_TYPE command = findCommand(userInput);
+                readFile(currentFilename);
+                switch (command) {
+                case ADD_LINE:
+                    addLine(getParameter(userInput));
+                    saveContents();
+                    break;
+                case DISPLAY:
+                    displayAllLines();
+                    break;
+                case DELETE:
+                    deleteLine(getParameter(userInput));
+                    saveContents();
+                    break;
+                case CLEAR:
+                    clearLines();
+                    saveContents();
+                    break;
+                case SORT:
+                    sortLines();
+                    saveContents();
+                    break;
+                case SEARCH:
+                    searchForLines(getParameter(userInput));
+                    break;
+                case EXIT:
+                    isExit = true;
+                    break;
+                case INVALID:
+                    displayHelpMessage();
+                    break;
+                default:
+                    throw new Exception(ERROR_UNKNOWN);
+
+                }
+
+            } catch (Exception err) {
+                printAndExitApplication(ERROR_UNKNOWN);
+            }
+        } while (!isExit);
+
+    }
+    
+    public static String executeTestCommand(ArrayList<ContentLine> content, COMMAND_TYPE cmd, String parameter){
+        fileContent = content;
+        switch(cmd){
+        case SORT:
+            sortLines();
+            break;
+        case SEARCH:
+            searchForLines(parameter);
+            break;
+        default:
+            break;
+        }
+        
+        return "";
+    }
+    
+    /**
+     * Method to save contents to file
+     * 
+     */
+    private static void saveContents() {
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(currentFilename);
+            for (ContentLine line : fileContent) {
+                writer.println(line);
+            }
+        } catch (Exception err) {
+            printAndExitApplication(ERROR_WHILE_SAVING);
+        } finally {
+            writer.close();
+        }
+
+    }
+
+    private static void searchForLines(String parameter) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private static void sortLines() {
+        sort(fileContent);
+        displayAllLines();
+    }
+
+    /**
+     * Method to sort an array of ContentLine objects alphabetically
+     * 
+     * @param fileContent2
+     *            Array containing ContentLine objects to be sorted
+     */
+    private static void sort(ArrayList<ContentLine> fileContent2) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private static void clearLines() {
+        fileContent.removeAll(fileContent);
+        displayClearAllMessage();
+    }
+
+    private static void displayClearAllMessage() {
+        showMessage(MESSAGE_ALL_CONTENT_DELETED, currentFilename);
+    }
+
+    private static void deleteLine(String parameter) {
+        if (fileContent.size() < 1 || parameter.isEmpty()) {
+            showMessage(MESSAGE_NOTHING_TO_DELETE, EMPTY_STRING);
+            return;
+        }
+
+        int lineToBeDeleted = 0;
+
+        try {
+            lineToBeDeleted = Integer.parseInt(parameter);
+        } catch (Exception err) {
+            return;
+        }
+
+        for (int i = 0; i < fileContent.size(); i++) {
+            if (lineToBeDeleted == (i + 1)) {
+                displayDeletedMessage(i);
+                fileContent.remove(i);
+                return;
+            }
+        }
+
+    }
+
+    private static void displayDeletedMessage(int i) {
+        showMessage(MESSAGE_DELETED_LINE,
+                toArray(currentFilename, fileContent.get(i).toString()));
+    }
+
+    private static void addLine(String parameter) {
+        if (parameter.isEmpty()) {
+            showMessage(MESSAGE_NOTHING_TO_ADD, EMPTY_STRING);
+            return;
+        }
+        ContentLine newContent = new ContentLine(parameter);
+        fileContent.add(newContent);
+        showMessage(MESSAGE_ADDED_LINE,
+                toArray(currentFilename, newContent.toString()));
+    }
+
+    private static void displayAllLines() {
+        int i = 1;
+        if (fileContent.size() < 1) {
+            displayEmptyFileMessage();
+            return;
+        }
+        for (ContentLine line : fileContent) {
+            showMessage(MESSAGE_DISPLAY_LINE_WITH_NUMBER,
+                    toArray(i + EMPTY_STRING, line.toString()));
+            i++;
+        }
+    }
+
+    private static void displayEmptyFileMessage() {
+        showMessage(MESSAGE_IS_EMPTY, currentFilename);
+    }
+
+    /**
+     * Method to obtain the string after the command word. i.e. add a blue
+     * cheese, return would be "a blue cheese"
+     * 
+     * @param userInput
+     *            Input to be analyzed
+     * @return String value
+     */
+    private static String getParameter(String userInput) {
+        if (userInput.isEmpty()) {
+            return EMPTY_STRING;
+        }
+
+        String[] pieces = userInput.split(REG_TO_SPLIT_USER_INPUT, SPLIT_LIMIT);
+
+        if (isInvalidNumberOfArguments(pieces)) {
+            return EMPTY_STRING;
+        }
+
+        String value = pieces[1];
+
+        return value.trim();
+    }
+
+    /**
+     * Method to cursorily check if user did not give a value.
+     * 
+     * @param pieces
+     *            Input to be checked
+     * @return True if there is no value; False otherwise
+     */
+    private static boolean isInvalidNumberOfArguments(String[] pieces) {
+        return pieces.length < SPLIT_LIMIT;
+    }
+
+    /**
+     * Method used to find the command from the user input
+     * 
+     * @param input
+     *            User input to be analyzed
+     * @return Command to be executed
+     */
+    private static COMMAND_TYPE findCommand(String input) {
+        if (input.isEmpty()) {
+            return COMMAND_TYPE.INVALID;
+        }
+        String[] pieces = input.split(REG_TO_SPLIT_USER_INPUT);
+        String command = pieces[0];
+
+        if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[0])) {
+            return COMMAND_TYPE.ADD_LINE;
+        } else if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[1])) {
+            return COMMAND_TYPE.DISPLAY;
+        } else if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[2])) {
+            return COMMAND_TYPE.DELETE;
+        } else if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[3])) {
+            return COMMAND_TYPE.CLEAR;
+        } else if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[4])) {
+            return COMMAND_TYPE.EXIT;
+        } else {
+            return COMMAND_TYPE.INVALID;
+        }
+    }
+
+    /**
+     * Method to print a help menu that shows all commands acceptable by the
+     * application
+     * 
+     */
+    private static void displayHelpMessage() {
+        System.out.println(ERROR_ILLEGAL_COMMAND);
+        for (int i = 0; i < COMMAND_FROM_CONSOLE.length; i++) {
+            System.out.print(COMMAND_FROM_CONSOLE[i] + " ");
+        }
+        System.out.println();
+    }
+
+    /**
+     * Method to display a message then quit the application
+     * 
+     * @param msg
+     *            Message to be printed before quitting
+     */
+    private static void printAndExitApplication(String msg) {
+        showMessage(msg, EMPTY_STRING);
+        System.exit(0);
+    }
+
+    /**
+     * Method to convert 2 separate strings into an array
+     * 
+     * @param x
+     *            First string
+     * @param y
+     *            Second string
+     * @return String array with the 2 strings
+     */
+    private static String[] toArray(String x, String y) {
+        return new String[] { x, y };
+    }
+
+    /**
+     * Method to print a message with an array of values
+     * 
+     * @param message
+     *            Message to be printed
+     * @param args
+     *            Array of values to be printed
+     */
+    private static void showMessage(String message, Object[] args) {
+        System.out.printf(message, args);
+    }
+
+    /**
+     * Method to print a message with a single value
+     * 
+     * @param message
+     *            Message to be printed
+     * @param args
+     *            A single value to be printed
+     */
+    private static void showMessage(String message, String args) {
+        System.out.printf(message, args);
+    }
+}
+
+/**
+ * <h1>ContentLine</h1> Object to hold contents of a file
+ * <p>
+ */
+class ContentLine {
+    // Private Constants
+    private final String REG_TO_SPLIT_CONTENT = " ";
+
+    // Class Variables
+    private String content = "";
+    private ArrayList<String> keywords = new ArrayList<String>();
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return this.content;
+    }
+
+    /**
+     * Method to implement the String.compareTo method on this class
+     * 
+     * @see java.lang.String#compareTo()
+     * 
+     * @param value
+     *            ContentLine value to be compared with
+     */
+    public int compareTo(ContentLine value) {
+        return this.content.compareTo(value.toString());
+    }
+
+    /**
+     * Method to implement the String.compareToIgnoreCase method on this class
+     * 
+     * @see java.lang.String#compareToIgnoreCase()
+     * 
+     * @param value
+     *            ContentLine value to be compared with
+     */
+    public int compareToIgnoreCase(ContentLine value) {
+        return this.content.compareToIgnoreCase(value.toString());
+    }
+
+    /**
+     * Method to initialize the keywords of a ContentLine object
+     * 
+     * @param content
+     *            String to be stored as keywords
+     */
+    private void initializeKeywords(String content) {
+        String[] pieces = content.split(REG_TO_SPLIT_CONTENT);
+        for (String i : pieces) {
+            this.keywords.add(i);
+        }
+    }
+
+    /**
+     * ContentLine Default Constructor
+     * 
+     * @param content
+     *            Content to be associated with a ContentLine Object
+     */
+    public ContentLine(String content) {
+        this.content = content;
+        initializeKeywords(content);
+    }
+
+    /**
+     * Method to check if a ContentLine object contains a specific word.
+     * 
+     * @param word
+     *            Word to check in the ContentLine object
+     * @return True if the ContentLine object contains the word; False otherwise
+     */
+    public boolean hasKeyword(String word) {
+        if (keywords.contains(word)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+}
