@@ -25,9 +25,8 @@ import java.util.Arrays;
  *
  */
 public class TextBuddy {
-    
-    // Special Constants
     public static final int ARRAY_START_INDEX = 0;
+
     public static final String EMPTY_STRING = "";
 
     // Messages required by TextBuddy
@@ -338,7 +337,7 @@ public class TextBuddy {
             return content;
         }
         int mid = content.length / 2;
-        ContentLine[] leftPartition = sort(Arrays.copyOfRange(content, ARRAY_START_INDEX, mid));
+        ContentLine[] leftPartition = sort(Arrays.copyOfRange(content, 0, mid));
         ContentLine[] rightPartition = sort(Arrays.copyOfRange(content, mid,
                 content.length));
         return merge(leftPartition, rightPartition, content.length);

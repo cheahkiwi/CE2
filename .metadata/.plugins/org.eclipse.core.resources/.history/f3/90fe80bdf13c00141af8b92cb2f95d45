@@ -25,9 +25,6 @@ import java.util.Arrays;
  *
  */
 public class TextBuddy {
-    
-    // Special Constants
-    public static final int ARRAY_START_INDEX = 0;
     public static final String EMPTY_STRING = "";
 
     // Messages required by TextBuddy
@@ -226,7 +223,6 @@ public class TextBuddy {
                     break;
                 case SORT:
                     sortLines();
-                    displayAllLines();
                     saveContents();
                     break;
                 case SEARCH:
@@ -304,17 +300,17 @@ public class TextBuddy {
     }
 
     private static ArrayList<ContentLine> searchForLines(String parameter) {
-        if (parameter.isEmpty()) {
+        if(parameter.isEmpty()){
             return fileContent;
         }
         ArrayList<ContentLine> result = new ArrayList<ContentLine>();
-
-        for (ContentLine line : fileContent) {
-            if (line.hasKeyword(parameter)) {
+        
+        for(ContentLine line : fileContent){
+            if(line.hasKeyword(parameter)){
                 result.add(line);
             }
         }
-
+        
         return result;
     }
 
@@ -326,8 +322,8 @@ public class TextBuddy {
     }
 
     /**
-     * Method to sort the array in alphabetical order. This sort uses the
-     * concept of merge sort
+     * Method to sort the array in alphabetical order. This sort uses the concept
+     * of merge sort
      * 
      * @param content
      *            Array to be sorted
@@ -338,7 +334,7 @@ public class TextBuddy {
             return content;
         }
         int mid = content.length / 2;
-        ContentLine[] leftPartition = sort(Arrays.copyOfRange(content, ARRAY_START_INDEX, mid));
+        ContentLine[] leftPartition = sort(Arrays.copyOfRange(content, 0, mid));
         ContentLine[] rightPartition = sort(Arrays.copyOfRange(content, mid,
                 content.length));
         return merge(leftPartition, rightPartition, content.length);
@@ -358,8 +354,8 @@ public class TextBuddy {
     private static ContentLine[] merge(ContentLine[] leftPartition,
             ContentLine[] rightPartition, int sizeOfArray) {
         ContentLine[] result = new ContentLine[sizeOfArray];
-        int leftIterator = ARRAY_START_INDEX;
-        int rightIterator = ARRAY_START_INDEX;
+        int leftIterator = 0;
+        int rightIterator = 0;
         for (int i = 0; i < result.length; i++) {
             if (leftIterator == leftPartition.length) {
                 result[i] = rightPartition[rightIterator];
@@ -368,31 +364,17 @@ public class TextBuddy {
                 result[i] = leftPartition[leftIterator];
                 leftIterator++;
             } else {
-                ContentLine firstElement = rightPartition[rightIterator];
-                ContentLine secondElement = leftPartition[leftIterator];
-                if (isFirstElementSmallerThanSecond(firstElement,secondElement)) {
-                    result[i] = firstElement;
+                if (rightPartition[rightIterator]
+                        .compareToIgnoreCase(leftPartition[leftIterator]) < 0) {
+                    result[i] = rightPartition[rightIterator];
                     rightIterator++;
                 } else {
-                    result[i] = secondElement;
+                    result[i] = leftPartition[leftIterator];
                     leftIterator++;
                 }
             }
         }
         return result;
-    }
-
-    /**
-     * Method to check if the first element is smaller than the second element in terms of alphabetical order
-     * 
-     * @param firstElement Left 
-     * @param secondElement
-     * @return True if first element is alphabetically smaller than second element
-     */
-    private static boolean isFirstElementSmallerThanSecond(
-            ContentLine firstElement, ContentLine secondElement) {
-        return firstElement
-                .compareToIgnoreCase(secondElement) < 0;
     }
 
     private static void clearLines() {
@@ -519,10 +501,6 @@ public class TextBuddy {
         } else if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[3])) {
             return COMMAND_TYPE.CLEAR;
         } else if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[4])) {
-            return COMMAND_TYPE.SORT;
-        } else if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[5])) {
-            return COMMAND_TYPE.SEARCH;
-        } else if (command.equalsIgnoreCase(COMMAND_FROM_CONSOLE[6])) {
             return COMMAND_TYPE.EXIT;
         } else {
             return COMMAND_TYPE.INVALID;
@@ -603,9 +581,8 @@ class ContentLine {
     private String content = "";
     private ArrayList<String> keywords = new ArrayList<String>();
 
-    /**
-     * Method that overrides the default Object toString method. This class has
-     * a special method to derive its string representation
+    /*
+     * (non-Javadoc)
      * 
      * @see java.lang.Object#toString()
      */
