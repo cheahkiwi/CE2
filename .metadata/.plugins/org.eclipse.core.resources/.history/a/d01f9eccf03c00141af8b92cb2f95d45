@@ -100,8 +100,6 @@ public class SortAndSearchTest {
         assertEquals(TEST_CASE_2_SEARCH_EXPECTED,TextBuddy.executeTestCommand(testCase2, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_2_KEYWORD));
         
         assertEquals(TEST_CASE_3_SEARCH_EXPECTED,TextBuddy.executeTestCommand(testCase3, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_3_KEYWORD));
-        
-        assertEquals(TEST_CASE_4_SEARCH_EXPECTED,TextBuddy.executeTestCommand(testCase4, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_4_KEYWORD));
     }
 
 }
