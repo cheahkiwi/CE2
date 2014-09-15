@@ -251,7 +251,7 @@ public class TextBuddy {
         switch(cmd){
         case SORT:
             sortLines();
-            result = printFileContentToString();
+            result = printFileContent();
             break;
         case SEARCH:
             searchForLines(parameter);
@@ -268,10 +268,12 @@ public class TextBuddy {
      * 
      * @return String representation of file content
      */
-    public static String printFileContentToString(){
+    public static String printFileContent(){
         String allContent = "";
         for(ContentLine line:fileContent){
-            allContent = allContent + line + "/n";
+            if(!line.toString().isEmpty()){
+                allContent = allContent + line + "/n";
+            }
         }
         return allContent.trim();
     }

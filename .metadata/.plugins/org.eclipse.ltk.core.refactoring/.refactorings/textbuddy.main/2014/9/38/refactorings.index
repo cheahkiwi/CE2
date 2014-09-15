@@ -13,3 +13,5 @@
 1410707029623	Extract constant 'MESSAGE_ADDED_LINE'
 1410707869976	Extract constant 'MESSAGE_DELETED_LINE'
 1410713932336	Delete element
+1410782029876	Rename method 'printFileContent'
+1410782043882	Rename method 'printToStringFileContent'

@@ -29,9 +29,9 @@ public class SortAndSearchTest {
     private ArrayList<ContentLine> testCase2=new ArrayList<ContentLine>();
     private final String TEST_CASE_2_LINE_1 = "Hello World";
     private final String TEST_CASE_2_LINE_2 = "Goodbye World";
-    private final String TEST_CASE_2_SEARCH_KEYWORD = "";
-    private final String TEST_CASE_2_SORT_EXPECTED = "Hello World/nGoodbye World/n";
-    private final String TEST_CASE_2_SEARCH_EXPECTED = "Hello World/nGoodbye World/n";
+    private final String TEST_CASE_2_SEARCH_KEYWORD = "Hello";
+    private final String TEST_CASE_2_SORT_EXPECTED = "HelloWorld/nGoodbye World/n";
+    private final String TEST_CASE_2_SEARCH_EXPECTED = "Hello World";
     
     /**
      * @throws java.lang.Exception
