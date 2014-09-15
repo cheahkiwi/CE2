@@ -25,9 +25,9 @@ public class SortAndSearchTest {
     
     // Sort Test Case 2
     private ArrayList<ContentLine> testCase2=new ArrayList<ContentLine>();
-    private final String TEST_CASE_2_LINE_1 = "A";
-    private final String TEST_CASE_2_LINE_2 = "B";
-    private final String TEST_CASE_2_SORT_EXPECTED = "A/nB/n";
+    private final String TEST_CASE_2_LINE_1 = "Hello World";
+    private final String TEST_CASE_2_LINE_2 = "Goodbye World";
+    private final String TEST_CASE_2_SORT_EXPECTED = "Hello World/nGoodbye World/n";
     
     /**
      * @throws java.lang.Exception
@@ -45,7 +45,7 @@ public class SortAndSearchTest {
      * Test method for {@link TextBuddy#executeTestCommand(java.util.ArrayList, TextBuddy.COMMAND_TYPE, java.lang.String)}.
      */
     @Test
-    public void testSortCommand() {
+    public void testExecuteTestCommand() {
         assertEquals(TEST_CASE_1_SORT_EXPECTED,TextBuddy.executeTestCommand(testCase1, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
         
         assertEquals(TEST_CASE_2_SORT_EXPECTED,TextBuddy.executeTestCommand(testCase2, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
