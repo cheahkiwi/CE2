@@ -302,6 +302,7 @@ public class TextBuddy {
 
     private static void sortLines() {
         sort(fileContent);
+        displayAllLines();
     }
 
     /**
