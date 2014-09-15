@@ -301,9 +301,18 @@ public class TextBuddy {
     }
 
     private static void sortLines() {
-        ContentLine temp = fileContent.get(0);
-        fileContent.remove(0);
-        fileContent.add(temp);
+        sort(fileContent);
+    }
+
+    /**
+     * Method to sort an array of ContentLine objects alphabetically
+     * 
+     * @param fileContent2
+     *            Array containing ContentLine objects to be sorted
+     */
+    private static void sort(ArrayList<ContentLine> fileContent2) {
+        // TODO Auto-generated method stub
+
     }
 
     private static void clearLines() {
