@@ -9,25 +9,30 @@ import java.util.Arrays;
 
 /**
  * <h1>TextBuddy</h1> TextBuddy application that performs functions as described
- * in CE1.
+ * in CE1 & CE2.
  * <p>
  * Assupmtions: -> If any exceptions/errors are encountered, default action is
  * to quit program -> If file already exist, file content must only contain text
  * 
- * Note: -> For regression testing, use TestInput.txt order for the expected
- * output to reflect the proper strings. Regression testing commands used:
+ * Note:
+ * 
+ * -> For regression testing, use TestInput.txt order for the expected output to
+ * reflect the proper strings. Regression testing commands used:
  * 
  * java TextBuddy TestFile.txt < testinput.txt > output.txt fc output.txt
  * expected.txt
  *
+ * ->For unit testing, use the entry method executeTestCommand() to test the
+ * sort and search functions.
  * 
  * @author Cheah Kit Weng, A0059806W
  *
  */
 public class TextBuddy {
-    
+
     // Special Constants
     public static final int ARRAY_START_INDEX = 0;
+    private static final int SORT_ONLY_ELEMENT = 1;
     public static final String EMPTY_STRING = "";
 
     // Messages required by TextBuddy
@@ -44,7 +49,9 @@ public class TextBuddy {
     public static final String ERROR_INVALID_ARGUMENTS = "Incorrect number of arugments found!%n";
     public static final String ERROR_FILENAME_INCORRECT = "File is invalid!%n";
     public static final String ERROR_WHILE_SAVING = "Error encountered while saving content to file!%n";
-    public static final String ERROR_ILLEGAL_COMMAND = "Invalid command detected! Acceptable commands are:";
+    public static final String ERROR_ILLEGAL_COMMAND = "Invalid command detected! Acceptable commands are:%n";
+    public static final String ERROR_ILLEGAL_COMMAND_SUPPLEMENTRY = "Invalid command detected!"
+            + " Acceptable commands are:%n";
     public static final String ERROR_UNKNOWN = "Unknown error encountered! TextBuddy is exiting...%n";
 
     // User-input related constants
@@ -230,7 +237,7 @@ public class TextBuddy {
                     saveContents();
                     break;
                 case SEARCH:
-                    fileContent = searchForLines(getParameter(userInput));
+                    searchForLines(getParameter(userInput));
                     displayAllLines();
                     break;
                 case EXIT:
@@ -241,7 +248,6 @@ public class TextBuddy {
                     break;
                 default:
                     throw new Exception(ERROR_UNKNOWN);
-
                 }
 
             } catch (Exception err) {
@@ -251,6 +257,17 @@ public class TextBuddy {
 
     }
 
+    /**
+     * Method to test functions using test cases
+     * 
+     * @param Content
+     *            The file content of test case
+     * @param cmd
+     *            Command type to test
+     * @param parameter
+     *            Additional parameters to be used
+     * @return String representation of result of test
+     */
     public static String executeTestCommand(ArrayList<ContentLine> content,
             COMMAND_TYPE cmd, String parameter) {
         fileContent = content;
@@ -258,16 +275,15 @@ public class TextBuddy {
         switch (cmd) {
         case SORT:
             sortLines();
-            result = printFileContentToString();
             break;
         case SEARCH:
-            fileContent = searchForLines(parameter);
-            result = printFileContentToString();
+            searchForLines(parameter);
             break;
         default:
             break;
         }
 
+        result = printFileContentToString();
         return result;
     }
 
@@ -303,9 +319,15 @@ public class TextBuddy {
 
     }
 
-    private static ArrayList<ContentLine> searchForLines(String parameter) {
+    /**
+     * Method to find lines with a particular keyword
+     * 
+     * @param parameter
+     *            Keyword to be searched for
+     */
+    private static void searchForLines(String parameter) {
         if (parameter.isEmpty()) {
-            return fileContent;
+            return;
         }
         ArrayList<ContentLine> result = new ArrayList<ContentLine>();
 
@@ -315,9 +337,13 @@ public class TextBuddy {
             }
         }
 
-        return result;
+        fileContent = result;
     }
 
+    /**
+     * Method to begin sorting the contents of file in alphabetical order
+     * 
+     */
     private static void sortLines() {
         ContentLine[] contentArray = new ContentLine[fileContent.size()];
         contentArray = fileContent.toArray(contentArray);
@@ -334,14 +360,26 @@ public class TextBuddy {
      * @return Sorted array
      */
     private static ContentLine[] sort(ContentLine[] content) {
-        if (content.length == 1) {
+        if (hasReachedBaseCase(content)) {
             return content;
         }
         int mid = content.length / 2;
-        ContentLine[] leftPartition = sort(Arrays.copyOfRange(content, ARRAY_START_INDEX, mid));
+        ContentLine[] leftPartition = sort(Arrays.copyOfRange(content,
+                ARRAY_START_INDEX, mid));
         ContentLine[] rightPartition = sort(Arrays.copyOfRange(content, mid,
                 content.length));
         return merge(leftPartition, rightPartition, content.length);
+    }
+
+    /**
+     * Method to determine if recursive base case has been met
+     * 
+     * @param content
+     *            Array to be checked
+     * @return True if the array has reached base case; False otherwise
+     */
+    private static boolean hasReachedBaseCase(ContentLine[] content) {
+        return content.length == SORT_ONLY_ELEMENT;
     }
 
     /**
@@ -361,16 +399,16 @@ public class TextBuddy {
         int leftIterator = ARRAY_START_INDEX;
         int rightIterator = ARRAY_START_INDEX;
         for (int i = 0; i < result.length; i++) {
-            if (leftIterator == leftPartition.length) {
+            if (hasReachedEndOfPartition(leftPartition, leftIterator)) {
                 result[i] = rightPartition[rightIterator];
                 rightIterator++;
-            } else if (rightIterator == rightPartition.length) {
+            } else if (hasReachedEndOfPartition(rightPartition, rightIterator)) {
                 result[i] = leftPartition[leftIterator];
                 leftIterator++;
             } else {
                 ContentLine firstElement = rightPartition[rightIterator];
                 ContentLine secondElement = leftPartition[leftIterator];
-                if (isFirstElementSmallerThanSecond(firstElement,secondElement)) {
+                if (isFirstElementSmallerThanSecond(firstElement, secondElement)) {
                     result[i] = firstElement;
                     rightIterator++;
                 } else {
@@ -383,34 +421,66 @@ public class TextBuddy {
     }
 
     /**
-     * Method to check if the first element is smaller than the second element in terms of alphabetical order
+     * Method to check if an iterator has reached end of a partition
      * 
-     * @param firstElement Left 
+     * @param partition
+     *            The partition to be checked
+     * @param partitionIterator
+     *            The iterator of the partition
+     * @return True if the iterator has reached end of partition; False
+     *         otherwise
+     */
+    private static boolean hasReachedEndOfPartition(ContentLine[] partition,
+            int partitionIterator) {
+        return partitionIterator == partition.length;
+    }
+
+    /**
+     * Method to check if the first element is smaller than the second element
+     * in terms of alphabetical order
+     * 
+     * @param firstElement
+     *            Left
      * @param secondElement
-     * @return True if first element is alphabetically smaller than second element
+     * @return True if first element is alphabetically smaller than second
+     *         element
      */
     private static boolean isFirstElementSmallerThanSecond(
             ContentLine firstElement, ContentLine secondElement) {
-        return firstElement
-                .compareToIgnoreCase(secondElement) < 0;
+        return firstElement.compareToIgnoreCase(secondElement) < 0;
     }
 
+    /**
+     * Method to clear all content in file
+     * 
+     */
     private static void clearLines() {
         fileContent.removeAll(fileContent);
         displayClearAllMessage();
     }
 
+    /**
+     * Method to display message associated to clearLines()
+     * 
+     * @see TextBuddy#clearLines()
+     */
     private static void displayClearAllMessage() {
         showMessage(MESSAGE_ALL_CONTENT_DELETED, currentFilename);
     }
 
+    /**
+     * Method to delete a specified line
+     * 
+     * @param parameter
+     *            Line to remove
+     */
     private static void deleteLine(String parameter) {
         if (fileContent.size() < 1 || parameter.isEmpty()) {
             showMessage(MESSAGE_NOTHING_TO_DELETE, EMPTY_STRING);
             return;
         }
 
-        int lineToBeDeleted = 0;
+        int lineToBeDeleted = ARRAY_START_INDEX;
 
         try {
             lineToBeDeleted = Integer.parseInt(parameter);
@@ -419,7 +489,7 @@ public class TextBuddy {
         }
 
         for (int i = 0; i < fileContent.size(); i++) {
-            if (lineToBeDeleted == (i + 1)) {
+            if (isLineToDelete(lineToBeDeleted, i)) {
                 displayDeletedMessage(i);
                 fileContent.remove(i);
                 return;
@@ -428,11 +498,38 @@ public class TextBuddy {
 
     }
 
+    /**
+     * Method to determine if a line is to be deleted
+     * 
+     * @param lineToBeDeleted
+     *            Line intended to be deleted
+     * @param i
+     *            Line to be checked
+     * @return True if current line is be deleted; False otherwise
+     */
+    private static boolean isLineToDelete(int lineToBeDeleted, int i) {
+        return lineToBeDeleted == (i + 1);
+    }
+
+    /**
+     * Method to display message associated with deleting a line
+     * 
+     * @see TextBuddy#deleteLine(String)
+     * 
+     * @param i
+     *            Line that is deleted
+     */
     private static void displayDeletedMessage(int i) {
         showMessage(MESSAGE_DELETED_LINE,
                 toArray(currentFilename, fileContent.get(i).toString()));
     }
 
+    /**
+     * Method to add a new line to the file content
+     * 
+     * @param parameter
+     *            New line to be added
+     */
     private static void addLine(String parameter) {
         if (parameter.isEmpty()) {
             showMessage(MESSAGE_NOTHING_TO_ADD, EMPTY_STRING);
@@ -444,6 +541,10 @@ public class TextBuddy {
                 toArray(currentFilename, newContent.toString()));
     }
 
+    /**
+     * Method to display all lines of file content to the user
+     * 
+     */
     private static void displayAllLines() {
         int i = 1;
         if (fileContent.size() < 1) {
@@ -457,6 +558,10 @@ public class TextBuddy {
         }
     }
 
+    /**
+     * Method to display message associated with an empty file
+     * 
+     */
     private static void displayEmptyFileMessage() {
         showMessage(MESSAGE_IS_EMPTY, currentFilename);
     }

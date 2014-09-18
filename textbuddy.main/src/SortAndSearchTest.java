@@ -1,4 +1,4 @@
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
@@ -6,59 +6,91 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * This class is a JUnit test class to test for each specified command in each
+ * test method.
  * 
- */
-
-/**
- * @author Kiwi
+ * Assumption: -> file content is never null
+ * 
+ * @author Cheah Kit Weng, A0059806W
  *
  */
 public class SortAndSearchTest {
 
     private final String EMPTY_STRING = "";
-    
+
     // Test Case 1
-    private ArrayList<ContentLine> testCase1=new ArrayList<ContentLine>();
+    private ArrayList<ContentLine> testCase1 = new ArrayList<ContentLine>();
     private final String TEST_CASE_1_LINE_1 = "";
     private final String TEST_CASE_1_LINE_2 = "";
-    
+
     // Test Case 2
-    private ArrayList<ContentLine> testCase2=new ArrayList<ContentLine>();
+    private ArrayList<ContentLine> testCase2 = new ArrayList<ContentLine>();
     private final String TEST_CASE_2_LINE_1 = "A";
     private final String TEST_CASE_2_LINE_2 = "B";
-    
+
     // Test Case 3
-    private ArrayList<ContentLine> testCase3=new ArrayList<ContentLine>();
+    private ArrayList<ContentLine> testCase3 = new ArrayList<ContentLine>();
     private final String TEST_CASE_3_LINE_1 = "B";
     private final String TEST_CASE_3_LINE_2 = "A";
-    
+
     // Test Case 4
-    private ArrayList<ContentLine> testCase4=new ArrayList<ContentLine>();
+    private ArrayList<ContentLine> testCase4 = new ArrayList<ContentLine>();
     private final String TEST_CASE_4_LINE_1 = "Hello World";
     private final String TEST_CASE_4_LINE_2 = "Bye Bye World";
     private final String TEST_CASE_4_LINE_3 = "An Apple a day keeps the Doctor away";
     private final String TEST_CASE_4_LINE_4 = "";
-    
+
     // Expected results for each sort test case
     private final String TEST_CASE_1_SORT_EXPECTED = "/n/n";
     private final String TEST_CASE_2_SORT_EXPECTED = "A/nB/n";
     private final String TEST_CASE_3_SORT_EXPECTED = "A/nB/n";
-    private final String TEST_CASE_4_SORT_EXPECTED = "/nAn Apple a day keeps the Doctor away/nBye Bye World/nHello World/n";
-    
+    private final String TEST_CASE_4_SORT_EXPECTED = "/nAn Apple a day keeps the Doctor away/n"
+            + "Bye Bye World/nHello World/n";
+
     // Keywords for each test case
     private final String TEST_CASE_1_KEYWORD = "";
     private final String TEST_CASE_2_KEYWORD = "";
     private final String TEST_CASE_3_KEYWORD = "A";
     private final String TEST_CASE_4_KEYWORD = "world";
-    
+
     // Expected results for each search test case
     private final String TEST_CASE_1_SEARCH_EXPECTED = "/n/n";
     private final String TEST_CASE_2_SEARCH_EXPECTED = "A/nB/n";
     private final String TEST_CASE_3_SEARCH_EXPECTED = "A/n";
     private final String TEST_CASE_4_SEARCH_EXPECTED = "Hello World/nBye Bye World/n";
-    
+
+    // Lines to add for add test case
+    private final String TEST_CASE_1_ADD_LINE = "";
+    private final String TEST_CASE_2_ADD_LINE = "";
+    private final String TEST_CASE_3_ADD_LINE = "C";
+    private final String TEST_CASE_4_ADD_LINE = "She sell seashells by the seashore";
+
+    // Expected results for each add test case
+    private final String TEST_CASE_1_ADD_EXPECTED = "\n\n\n";
+    private final String TEST_CASE_2_ADD_EXPECTED = "A\nB\n\n";
+    private final String TEST_CASE_3_ADD_EXPECTED = "B\nA\nC\n";
+    private final String TEST_CASE_4_ADD_EXPECTED = "Hello World\nBye Bye World\n"
+            + "An Apple a day keeps the Doctor away\nShe sell seashells by the seashore\n";
+
+    // Lines to delete for delete case
+    private final String TEST_CASE_1_DELETE_LINE = "";
+    private final String TEST_CASE_2_DELETE_LINE = "-1";
+    private final String TEST_CASE_3_DELETE_LINE = "1";
+    private final String TEST_CASE_4_DELETE_LINE = "10000";
+
+    // Expected results for each add test case
+    private final String TEST_CASE_1_DELETE_EXPECTED = "\n\n";
+    private final String TEST_CASE_2_DELETE_EXPECTED = "A\nB\n";
+    private final String TEST_CASE_3_DELETE_EXPECTED = "A\n";
+    private final String TEST_CASE_4_DELETE_EXPECTED = "Hello World\nBye Bye World\n"
+            + "An Apple a day keeps the Doctor away\n";
+
+    // Expected results for each clear test case
+    private final String TEST_CASE_1_CLEAR_EXPECTED = "";
+
     /**
-     * Eclipse generated setUp method to initialize each test case data structure
+     * Eclipse generated setUp method to initialize each test case data
+     * structure
      * 
      * @throws java.lang.Exception
      */
@@ -66,13 +98,13 @@ public class SortAndSearchTest {
     public void setUp() throws Exception {
         testCase1.add(new ContentLine(TEST_CASE_1_LINE_1));
         testCase1.add(new ContentLine(TEST_CASE_1_LINE_2));
-        
+
         testCase2.add(new ContentLine(TEST_CASE_2_LINE_1));
         testCase2.add(new ContentLine(TEST_CASE_2_LINE_2));
-        
+
         testCase3.add(new ContentLine(TEST_CASE_3_LINE_1));
         testCase3.add(new ContentLine(TEST_CASE_3_LINE_2));
-        
+
         testCase4.add(new ContentLine(TEST_CASE_4_LINE_1));
         testCase4.add(new ContentLine(TEST_CASE_4_LINE_2));
         testCase4.add(new ContentLine(TEST_CASE_4_LINE_3));
@@ -80,28 +112,45 @@ public class SortAndSearchTest {
     }
 
     /**
-     * Test method for {@link TextBuddy#executeTestCommand(java.util.ArrayList, TextBuddy.COMMAND_TYPE, java.lang.String)}.
+     * Test method to execute the Sort command using the executeTestCommand
+     * entry point
+     * {@link TextBuddy#executeTestCommand(java.util.ArrayList, TextBuddy.COMMAND_TYPE, java.lang.String)}
+     * 
      */
     @Test
     public void testSortCommand() {
-        assertEquals(TEST_CASE_1_SORT_EXPECTED,TextBuddy.executeTestCommand(testCase1, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
-        
-        assertEquals(TEST_CASE_2_SORT_EXPECTED,TextBuddy.executeTestCommand(testCase2, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
-        
-        assertEquals(TEST_CASE_3_SORT_EXPECTED,TextBuddy.executeTestCommand(testCase3, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
-        
-        assertEquals(TEST_CASE_4_SORT_EXPECTED,TextBuddy.executeTestCommand(testCase4, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
+        assertEquals(TEST_CASE_1_SORT_EXPECTED, TextBuddy.executeTestCommand(
+                testCase1, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
+
+        assertEquals(TEST_CASE_2_SORT_EXPECTED, TextBuddy.executeTestCommand(
+                testCase2, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
+
+        assertEquals(TEST_CASE_3_SORT_EXPECTED, TextBuddy.executeTestCommand(
+                testCase3, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
+
+        assertEquals(TEST_CASE_4_SORT_EXPECTED, TextBuddy.executeTestCommand(
+                testCase4, TextBuddy.COMMAND_TYPE.SORT, EMPTY_STRING));
     }
-    
+
+    /**
+     * Test method to execute the Search command using the executeTestCommand
+     * entry point
+     * {@link TextBuddy#executeTestCommand(java.util.ArrayList, TextBuddy.COMMAND_TYPE, java.lang.String)}
+     * 
+     */
     @Test
-    public void testSearchCommand(){
-        assertEquals(TEST_CASE_1_SEARCH_EXPECTED,TextBuddy.executeTestCommand(testCase1, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_1_KEYWORD));
-        
-        assertEquals(TEST_CASE_2_SEARCH_EXPECTED,TextBuddy.executeTestCommand(testCase2, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_2_KEYWORD));
-        
-        assertEquals(TEST_CASE_3_SEARCH_EXPECTED,TextBuddy.executeTestCommand(testCase3, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_3_KEYWORD));
-        
-        assertEquals(TEST_CASE_4_SEARCH_EXPECTED,TextBuddy.executeTestCommand(testCase4, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_4_KEYWORD));
+    public void testSearchCommand() {
+        assertEquals(TEST_CASE_1_SEARCH_EXPECTED, TextBuddy.executeTestCommand(
+                testCase1, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_1_KEYWORD));
+
+        assertEquals(TEST_CASE_2_SEARCH_EXPECTED, TextBuddy.executeTestCommand(
+                testCase2, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_2_KEYWORD));
+
+        assertEquals(TEST_CASE_3_SEARCH_EXPECTED, TextBuddy.executeTestCommand(
+                testCase3, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_3_KEYWORD));
+
+        assertEquals(TEST_CASE_4_SEARCH_EXPECTED, TextBuddy.executeTestCommand(
+                testCase4, TextBuddy.COMMAND_TYPE.SEARCH, TEST_CASE_4_KEYWORD));
     }
 
 }
